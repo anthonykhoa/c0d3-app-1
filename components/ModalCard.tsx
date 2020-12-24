@@ -8,7 +8,7 @@ export enum ModalSize {
   LARGE = 'large'
 }
 
-interface ModalCardProps {
+export interface ModalCardProps {
   show: boolean
   close: Function
   size?: ModalSize
@@ -19,15 +19,13 @@ export const ModalCard: React.FC<ModalCardProps> = ({
   close,
   size = 'medium',
   children
-}) => {
-  return (
-    <Modal show={show} onHide={close} dialogClassName={size}>
-      <img
-        className=".img-fluid btn position-absolute exitBtn"
-        src={'/curriculumAssets/icons/exit.svg'}
-        onClick={() => close()}
-      />
-      {children}
-    </Modal>
-  )
-}
+}) => (
+  <Modal show={show} onHide={close} dialogClassName={size}>
+    <img
+      className=".img-fluid btn position-absolute exitBtn"
+      src={'/curriculumAssets/icons/exit.svg'}
+      onClick={() => close()}
+    />
+    {children}
+  </Modal>
+)

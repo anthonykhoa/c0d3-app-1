@@ -14,6 +14,7 @@ import Prism from 'prismjs'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import _ from 'lodash'
+import { GiveStarCard } from './GiveStarCard'
 
 dayjs.extend(relativeTime)
 
@@ -54,6 +55,7 @@ type ChallengesCompletedCardProps = {
   imageSrc: string
   reviewUrl: string
   chatUrl: string
+  lessonId: string
 }
 
 export const ReviewStatus: React.FC<ReviewStatusProps> = ({
@@ -229,46 +231,58 @@ export const ChallengeQuestionCard: React.FC<ChallengeQuestionCardProps> = ({
 }
 
 export const ChallengesCompletedCard: React.FC<ChallengesCompletedCardProps> = props => {
+  const [show, setShow] = useState(false)
   return (
-    <div className="card text-center shadow-sm">
-      <div className="card-body">
-        <img
-          src={`/curriculumAssets/icons/${props.imageSrc}`}
-          className="mt-3"
-        ></img>
-        <h4 className="card-title mt-2">Congratulations!</h4>
-        <p className="success-message">
-          You have successfully completed all challenges
-        </p>
-        <p className="review-message">
-          You can help your peers by
-          <NavLink
-            path={props.chatUrl}
-            className="font-weight-bold mx-1"
-            external
+    <>
+      <GiveStarCard
+        lessonId={props.lessonId}
+        show={show}
+        close={() => setShow(false)}
+        givenStar=""
+      />
+      <div className="card text-center shadow-sm">
+        <div className="card-body">
+          <img
+            src={`/curriculumAssets/icons/${props.imageSrc}`}
+            className="mt-3"
+          ></img>
+          <h4 className="card-title mt-2">Congratulations!</h4>
+          <p className="success-message">
+            You have successfully completed all challenges
+          </p>
+          <p className="review-message">
+            You can help your peers by
+            <NavLink
+              path={props.chatUrl}
+              className="font-weight-bold mx-1"
+              external
+            >
+              answering questions
+            </NavLink>
+            they have in the lesson and
+            <NavLink
+              path={props.reviewUrl}
+              className="font-weight-bold mx-1"
+              external
+            >
+              reviewing challenge submissions
+            </NavLink>
+          </p>
+        </div>
+        <div className="card-footer d-flex bg-primary">
+          <p className="text-white mr-3 my-2">
+            You can show your appreciation to the user that helped you the most
+            by giving them a star
+          </p>
+          <button
+            className="btn btn-light text-primary font-weight-bold ml-auto"
+            onClick={() => setShow(true)}
           >
-            answering questions
-          </NavLink>
-          they have in the lesson and
-          <NavLink
-            path={props.reviewUrl}
-            className="font-weight-bold mx-1"
-            external
-          >
-            reviewing challenge submissions
-          </NavLink>
-        </p>
+            Give Star
+          </button>
+        </div>
       </div>
-      <div className="card-footer d-flex bg-primary">
-        <p className="text-white mr-3 my-2">
-          You can show your appreciation to the user that helped you the most by
-          giving them a star
-        </p>
-        <button className="btn btn-light text-primary font-weight-bold ml-auto">
-          Give Star
-        </button>
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -358,6 +372,7 @@ const ChallengeMaterial: React.FC<ChallengeMaterialProps> = ({
           <ChallengesCompletedCard
             imageSrc="icon-challenge-complete.jpg"
             chatUrl={chatUrl}
+            lessonId={lessonId}
             reviewUrl={`https://www.c0d3.com/review/${lessonId}`}
           />
         )}
