@@ -4,75 +4,56 @@ import { GiveStarCard } from '../../components/GiveStarCard'
 import { Button } from '../../components/theme/Button'
 import GET_LESSON_MENTORS from '../../graphql/queries/getLessonMentors'
 import SET_STAR from '../../graphql/queries/setStar'
+import noop from '../../helpers/noop'
+import lessonMentorsData from '../../__dummy__/getLessonMentorsData'
 export default {
   component: GiveStarCard,
   title: 'Components/GiveStarCard'
 }
-
-const mocks = [
-  {
-    request: { query: GET_LESSON_MENTORS, variables: { lessonId: '4' } },
-    result: {
-      data: {
-        getLessonMentors: [
-          { username: 'bob', name: 'bob bafet', id: '4' },
-          { username: 'bleamie', name: 'boba boba', id: '4' },
-          { username: 'fork', name: 'bo bo', id: '4' },
-          { username: 'forkUnicorn', name: 'kang bo', id: '4' },
-          // {
-          //   username:
-          //     'POTATOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
-          //   name:
-          //     'POTATOMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM'
-          // },
-          { username: 'enlightenedBanana', name: 'never wanna', id: '4' },
-          { username: 'seriousToiletPaper', name: 'give you', id: '4' },
-          { username: 'pencilSaver', name: 'let you', id: '4' },
-          { username: 'importantBagel', name: 'up down', id: '4' },
-          { username: 'bagelOfAngels', name: 'wax on', id: '4' },
-          { username: 'l0lCakes', name: 'wax off', id: '4' },
-          { username: 'pencilSaver', name: 'let you', id: '4' },
-          { username: 'importantBagel', name: 'up down', id: '4' },
-          { username: 'bagelOfAngels', name: 'wax on', id: '4' }
-        ]
-      }
-    }
+const mocks = Array(30).fill({
+  request: {
+    query: SET_STAR,
+    variables: { mentorId: 4, lessonId: 4, comment: '1' }
   },
-  {
-    request: {
-      query: SET_STAR,
-      variables: { mentorId: 803, lessonId: 433 }
-      // context: {
-      //   req: {
-      //     user: {
-      //       id: 444
-      //     }
-      //   }
-      // }
-    },
-    result: {
-      data: {
-        setStar: {
-          success: true
-        }
-      }
-    }
+  result: {
+    data: { setStar: { success: true } }
   }
-]
-
-// const add = (num1: number, num2: number): number => {
-//   return num1 + num2
-// }
+})
+mocks.push({
+  request: { query: GET_LESSON_MENTORS, variables: { lessonId: '4' } },
+  result: {
+    data: { getLessonMentors: lessonMentorsData }
+  }
+})
 
 const MockBasic: React.FC = () => {
   const [show, setShow] = useState(true)
-
+  const [givenStar, setGivenStar] = useState<string>('')
   const close = () => setShow(false)
+  /*
+    Mock mutations in the storybook require all parameters(even optional)
+    of the mutation operation to be filled out. This is why a comment is neccessary
+    in order to see the `Thanks` display after someone gives a star
+  */
   return (
     <>
       <Button onClick={() => setShow(!show)}>Launch demo modal</Button>
+      <Button onClick={() => setGivenStar('')} type="primary" color="white">
+        Reset star
+      </Button>
+      <h1 className="mt-5">
+        Type in<span className="font-italic"> 1 </span>as a
+      </h1>
+      <h1>comment for the</h1>
+      <h1>Give Star button to work</h1>
       <MockedProvider mocks={mocks} addTypename={false}>
-        <GiveStarCard givenStar="" lessonId={'4'} show={show} close={close} />
+        <GiveStarCard
+          givenStar={givenStar}
+          lessonId={'4'}
+          show={show}
+          close={close}
+          setGivenStar={setGivenStar}
+        />
       </MockedProvider>
     </>
   )
@@ -84,22 +65,17 @@ const MockAlreadyGaveStar: React.FC = () => {
   return (
     <>
       <Button onClick={() => setShow(!show)}>Launch demo modal</Button>
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <GiveStarCard
-          givenStar="omega shenron"
-          lessonId={'4'}
-          show={show}
-          close={close}
-        />
-      </MockedProvider>
+      <GiveStarCard
+        givenStar="omega shenron"
+        lessonId={'4'}
+        show={show}
+        setGivenStar={noop}
+        close={close}
+      />
     </>
   )
 }
 
-export const Basic: React.FC = () => {
-  return <MockBasic />
-}
+export const Basic: React.FC = () => <MockBasic />
 
-export const AlreadyGaveStar: React.FC = () => {
-  return <MockAlreadyGaveStar />
-}
+export const AlreadyGaveStar: React.FC = () => <MockAlreadyGaveStar />

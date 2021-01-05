@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GiveStarCard Component should display \`already given star to\` display when givenStar prop does not equal empty string 1`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display SearchMentor component if givenStar prop equals empty string 1`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display SearchMentor component if givenStar prop equals empty string 2`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display SearchMentor component if givenStar prop equals empty string 3`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display SearchMentor component if givenStar prop equals empty string 4`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display SearchMentor component if givenStar prop equals empty string 5`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display error message when giving a star fails 1`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display error message when giving a star fails 2`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`GiveStarCard Component should display nothing when show prop value is false 1`] = `<div />`;

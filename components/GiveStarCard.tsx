@@ -1,59 +1,124 @@
 import React, { useState } from 'react'
-import { User } from '../graphql/index'
+import { User, useSetStarMutation } from '../graphql/index'
 import withQueryLoader, { QueryDataProps } from '../containers/withQueryLoader'
 import { Button } from '../components/theme/Button'
 import GET_LESSON_MENTORS from '../graphql/queries/getLessonMentors'
 import '../scss/giveStarCard.scss'
-import SET_STAR from '../graphql/queries/setStar'
-import { useMutation } from '@apollo/react-hooks'
 import { ModalCard, ModalCardProps } from './ModalCard'
 import { Thanks } from './Thanks'
 
-type GiveStarType = {
-  mentorId?: number
-  username?: string
-  done?: boolean
-}
-
-interface Select {
+interface Mentor {
   username: string
   mentorId: number
-  setGiveStar: React.Dispatch<React.SetStateAction<GiveStarType>>
 }
 
-const GiveStar: React.FC<{ lessonId: number } & Select> = ({
+type MentorCardProps = {
+  setMentor: React.Dispatch<React.SetStateAction<Partial<Mentor>>>
+  name: string
+} & Mentor
+
+const MentorCard: React.FC<MentorCardProps> = ({
+  username,
+  name,
+  mentorId,
+  setMentor
+}) => (
+  <div
+    className="mb-3 rounded-lg d-flex justify-content-center align-items-center flex-column mentor position-relative"
+    onClick={() => setMentor({ username, mentorId })}
+  >
+    <div className="text-white position-absolute mentor sendStar align-items-center justify-content-center">
+      <h5 className="mt-0 mb-0">Send Star</h5>
+    </div>
+    <h6 className="mb-0 mt-0 font-weight-light">{name}</h6>
+    <span className="text-muted font-weight-light mt-0 mb-0">@{username}</span>
+  </div>
+)
+
+type SearchMentorProps = {
+  setMentor: React.Dispatch<React.SetStateAction<Partial<Mentor>>>
+  mentors: User[]
+}
+
+const SearchMentor: React.FC<SearchMentorProps> = ({ setMentor, mentors }) => {
+  const [search, setSearch] = useState<string>('')
+
+  const searchTerm = search.toLowerCase()
+  const includes = (str: string) => str.toLowerCase().includes(searchTerm)
+  const filteredList = mentors.filter(({ username, name }) => {
+    return includes(username as string) || includes(name as string)
+  })
+
+  const mentorsList = filteredList.map(({ username, name, id }, key) => (
+    <MentorCard
+      key={key}
+      username={username as string}
+      name={name as string}
+      mentorId={parseInt(id as string)}
+      setMentor={setMentor}
+    />
+  ))
+
+  return (
+    <>
+      <div className="d-flex flex-column pt-2 pt-4 pl-5 pr-5 pb-4">
+        <h4 className="font-weight-bold mt-2 mb-4 pt-2 pb-1">
+          Who helped you the most?
+        </h4>
+        <input
+          data-testid="giveStarInput"
+          onChange={e => setSearch(e.target.value)}
+          className="form-control-lg form-control font-weight-light h6"
+        />
+      </div>
+      <div className="pt-4 mentorsList pb-3 mb-1">
+        <div className="row mr-5 ml-5 mt-1 d-flex flex-wrap justify-content-between">
+          {mentorsList}
+        </div>
+      </div>
+    </>
+  )
+}
+
+type GiveStarProps = {
+  lessonId: number
+  setMentor: React.Dispatch<React.SetStateAction<Partial<Mentor>>>
+  setDone: React.Dispatch<React.SetStateAction<string>>
+} & Mentor
+
+const GiveStar: React.FC<GiveStarProps> = ({
   username,
   mentorId,
   lessonId,
-  setGiveStar
+  setMentor,
+  setDone
 }) => {
   const [comment, setComment] = useState('')
-  //replace with useSetStarMutation
-  const [setStar, { data }] = useMutation(SET_STAR)
+  const [setStar, { error }] = useSetStarMutation()
 
-  console.log(data)
   const giveStar = async () => {
     try {
       await setStar({ variables: { mentorId, lessonId, comment } })
-      setGiveStar({ done: true })
-    } catch (err) {
-      throw new Error(err)
-    }
+      setDone(username)
+    } catch {}
   }
-  // const giveStar = () => {
-  //   setGiveStar({ done: true })
-  // }
-  // if (0) {
-  //   console.log(mentorId, lessonId, comment)
-  // }
+
+  if (error) {
+    return (
+      <div className="mb-0 mt-0 p-4 text-center">
+        <h4 className="mt-0 mb-0">Error sending star, please try again</h4>
+      </div>
+    )
+  }
 
   return (
     <>
       <div className="position-absolute left-0">
         <img
+          data-testid="backButton"
           className=".img-fluid btn"
           src="/curriculumAssets/icons/left-arrow.svg"
-          onClick={() => setGiveStar({})}
+          onClick={() => setMentor({})}
         />
       </div>
       <div className="d-flex justify-content-center align-items-center flex-column modal-height-med">
@@ -76,128 +141,83 @@ const GiveStar: React.FC<{ lessonId: number } & Select> = ({
   )
 }
 
-const Mentor: React.FC<{ name: string } & Select> = ({
-  username,
-  name,
-  mentorId,
-  setGiveStar
-}) => (
-  <div
-    className="mb-3 rounded-lg d-flex justify-content-center align-items-center flex-column mentor position-relative"
-    onClick={() => setGiveStar({ username, mentorId })}
-  >
-    <div className="text-white position-absolute mentor sendStar align-items-center justify-content-center">
-      <h5>Send Star</h5>
-    </div>
-    <h6 className="mb-0 font-weight-light">{name}</h6>
-    <span className="text-muted font-weight-light">@{username}</span>
-  </div>
-)
-
-type SearchMentorProps = {
-  setGiveStar: React.Dispatch<React.SetStateAction<GiveStarType>>
-  mentors: User[]
-}
-
-const SearchMentor: React.FC<SearchMentorProps> = ({
-  setGiveStar,
-  mentors
-}) => {
-  const [search, setSearch] = useState<string>('')
-
-  const searchTerm = search.toLowerCase()
-  const includes = (str: string) => str.toLowerCase().includes(searchTerm)
-  const filteredList = mentors.filter(({ username, name }) => {
-    return includes(username as string) || includes(name as string)
-  })
-
-  const mentorsList = filteredList.map(({ username, name, id }, key) => (
-    <Mentor
-      key={key}
-      username={username as string}
-      name={name as string}
-      mentorId={parseInt(id as string)}
-      setGiveStar={setGiveStar}
-    />
-  ))
-
-  return (
-    <>
-      <div className="d-flex flex-column pt-2 pt-4 pl-5 pr-5 pb-4">
-        <h4 className="font-weight-bold mt-2 mb-4 pt-2 pb-1">
-          Who helped you the most?
-        </h4>
-        <input
-          onChange={e => setSearch(e.target.value)}
-          className="form-control-lg form-control font-weight-light h6"
-        />
-      </div>
-      <div className="pt-4 mentorsList pb-3 mb-1">
-        <div className="row mr-5 ml-5 mt-1 d-flex flex-wrap justify-content-between">
-          {mentorsList}
-        </div>
-      </div>
-    </>
-  )
-}
-
 type LessonMentorsData = { getLessonMentors: User[] }
-type StarCardProps = { close: Function; lessonId: string } & QueryDataProps<
-  LessonMentorsData
->
+type StarCardProps = {
+  handleClose: Function
+  lessonId: number
+  done: string
+  setDone: React.Dispatch<React.SetStateAction<string>>
+} & QueryDataProps<LessonMentorsData>
 
 const StarCard: React.FC<StarCardProps> = ({
-  close,
+  handleClose,
   lessonId,
-  queryData: { getLessonMentors }
+  done,
+  setDone,
+  queryData: { getLessonMentors: mentors }
 }) => {
-  const [{ mentorId, username, done }, setGiveStar] = useState<GiveStarType>({})
+  const [{ mentorId, username }, setMentor] = useState<Partial<Mentor>>({})
 
   if (done) {
-    return <Thanks close={close} />
+    return <Thanks close={handleClose} />
   }
 
-  if (mentorId) {
+  if (mentorId && username) {
     return (
       <GiveStar
-        lessonId={parseInt(lessonId)}
+        lessonId={lessonId}
         mentorId={mentorId}
-        username={username as string}
-        setGiveStar={setGiveStar}
+        username={username}
+        setMentor={setMentor}
+        setDone={setDone}
       />
     )
   }
 
-  return <SearchMentor setGiveStar={setGiveStar} mentors={getLessonMentors} />
+  return <SearchMentor setMentor={setMentor} mentors={mentors} />
 }
 
 type GiveStarCardProps = {
   lessonId: string
   givenStar: string
+  setGivenStar: Function
 } & ModalCardProps
 
 export const GiveStarCard: React.FC<GiveStarCardProps> = ({
   lessonId,
   show,
   close,
-  givenStar
-}) => (
-  <ModalCard show={show} close={close}>
-    {givenStar ? (
-      <div className="mb-0 mt-0 p-4 text-center">
-        <h4 className="mt-0 mb-0">
-          You have already given a star to
-          <span className="font-italic"> {givenStar}!</span>
-        </h4>
-      </div>
-    ) : (
-      withQueryLoader<LessonMentorsData>(
-        {
-          query: GET_LESSON_MENTORS,
-          getParams: () => ({ variables: { lessonId } })
-        },
-        props => <StarCard {...(props as StarCardProps)} />
-      )({ lessonId, close })
-    )}
-  </ModalCard>
-)
+  givenStar,
+  setGivenStar
+}) => {
+  if (!show) return <></>
+  const [done, setDone] = useState<string>('')
+
+  const handleClose = () => {
+    close()
+    done && setGivenStar(done)
+  }
+
+  const displayChoice = givenStar ? (
+    <div className="mb-0 mt-0 p-4 text-center">
+      <h4 className="mt-0 mb-0">
+        You have already given a star to
+        <span className="font-italic"> {givenStar}!</span>
+      </h4>
+    </div>
+  ) : (
+    withQueryLoader<LessonMentorsData>(
+      {
+        query: GET_LESSON_MENTORS,
+        getParams: () => ({ variables: { lessonId } })
+      },
+      props => <StarCard {...(props as StarCardProps)} />
+    )({ lessonId: parseInt(lessonId), handleClose, done, setDone })
+  )
+
+  return (
+    <ModalCard show={show} close={handleClose}>
+      {displayChoice}
+    </ModalCard>
+  )
+}
