@@ -124,16 +124,19 @@ const GiveStar: React.FC<GiveStarProps> = ({
         />
       </div>
       <div className="d-flex justify-content-center align-items-center flex-column modal-height-med">
-        <h3 className="mb-3 text-break mt-5 pt-3 text-center pl-5 pr-5">
+        <h3 className="mt-3 pt-1 text-break text-center pl-5 pr-5">
           You are giving a Star to
-          <span className="font-italic long"> {username}!</span>
+        </h3>
+        <h3 className="font-italic long mb-4 pl-5 pr-5">
+             {username}!
         </h3>
         <textarea
+          style={{height: '40%'}}
           placeholder="Give a comment along with your Star!"
-          className=" mb-4 border-bottom form-control h-100 w-75"
+          className="mb-4 border-bottom form-control w-75 d-inline-block"
           onChange={e => setComment(e.target.value)}
         />
-        <div className="mb-5">
+        <div className="">
           <Button type="primary" color="white" onClick={giveStar}>
             Give Star!
           </Button>
@@ -204,7 +207,9 @@ export const GiveStarCard: React.FC<GiveStarCardProps> = ({
     <div className="mb-0 mt-0 p-4 text-center">
       <h4 className="mt-0 mb-0">
         You have already given a star to
-        <span className="font-italic"> {givenStar}!</span>
+      </h4>
+      <h4 className="font-italic long">
+        {givenStar}!
       </h4>
     </div>
   ) : (
