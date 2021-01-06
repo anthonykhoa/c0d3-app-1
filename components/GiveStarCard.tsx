@@ -30,8 +30,10 @@ const MentorCard: React.FC<MentorCardProps> = ({
     <div className="text-white position-absolute mentor sendStar align-items-center justify-content-center">
       <h5 className="mt-0 mb-0">Send Star</h5>
     </div>
-    <h6 className="mb-0 mt-0 font-weight-light">{name}</h6>
-    <span className="text-muted font-weight-light mt-0 mb-0">@{username}</span>
+    <h6 className="mb-0 mt-0 font-weight-light pr-3 pl-3">{name}</h6>
+    <span className="text-muted font-weight-light mt-0 mb-0 pr-3 pl-3">
+      @{username}
+    </span>
   </div>
 )
 
@@ -71,8 +73,8 @@ const SearchMentor: React.FC<SearchMentorProps> = ({ setMentor, mentors }) => {
           className="form-control-lg form-control font-weight-light h6"
         />
       </div>
-      <div className="pt-4 mentorsList pb-3 mb-1">
-        <div className="row mr-5 ml-5 mt-1 d-flex flex-wrap justify-content-between">
+      <div className="pt-4 mentorsList">
+        <div className="row mr-5 ml-5 mt-1 d-flex flex-wrap justify-content-between mb-2">
           {mentorsList}
         </div>
       </div>
@@ -82,7 +84,7 @@ const SearchMentor: React.FC<SearchMentorProps> = ({ setMentor, mentors }) => {
 
 type GiveStarProps = {
   lessonId: number
-  setMentor: React.Dispatch<React.SetStateAction<Partial<Mentor>>>
+  goBack: () => void
   setDone: React.Dispatch<React.SetStateAction<string>>
 } & Mentor
 
@@ -90,7 +92,7 @@ const GiveStar: React.FC<GiveStarProps> = ({
   username,
   mentorId,
   lessonId,
-  setMentor,
+  goBack,
   setDone
 }) => {
   const [comment, setComment] = useState('')
@@ -118,13 +120,13 @@ const GiveStar: React.FC<GiveStarProps> = ({
           data-testid="backButton"
           className=".img-fluid btn"
           src="/curriculumAssets/icons/left-arrow.svg"
-          onClick={() => setMentor({})}
+          onClick={goBack}
         />
       </div>
       <div className="d-flex justify-content-center align-items-center flex-column modal-height-med">
-        <h3 className="mb-3 text-break mt-5 pt-3 text-center">
+        <h3 className="mb-3 text-break mt-5 pt-3 text-center pl-5 pr-5">
           You are giving a Star to
-          <span className="font-italic"> {username}!</span>
+          <span className="font-italic long"> {username}!</span>
         </h3>
         <textarea
           placeholder="Give a comment along with your Star!"
@@ -168,7 +170,7 @@ const StarCard: React.FC<StarCardProps> = ({
         lessonId={lessonId}
         mentorId={mentorId}
         username={username}
-        setMentor={setMentor}
+        goBack={() => setMentor({})}
         setDone={setDone}
       />
     )
